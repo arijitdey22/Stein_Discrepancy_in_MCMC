@@ -160,27 +160,25 @@ for (i in 1:length(n.all)){
   
   # -- -- -- 
   
-  tick <- proc.time()[3]
   m <- ceiling(log(n)^2)
+  tick <- proc.time()[3]
   ind <- stein.thin.indices(samp, m)
+  tock <- proc.time()[3]
   samp.thin <- samp[ind, ]
+  time.elaps.KSD.thinned.thinning[i] <- tock - tick
   
-  tick1 <- proc.time()[3]
+  tick <- proc.time()[3]
   KSD.thinned[i] <- KSD(samp = samp.thin)
   tock <- proc.time()[3]
+  time.elaps.KSD.thinned[i] <- tock - tick
   
   # -- -- -- 
   
-  time.elaps.KSD.thinned[i] <- tock - tick1
-  time.elaps.KSD.thinned1[i] <- tock - tick1
-  time.elaps.KSD.thinned.total[i] <- tock - tick
-  
-  # -- -- -- 
   print(paste0("We are at n = ", n.all[i]))
   
 }
 
-save(n.all, KSD.all, time.elaps.KSD, KSD.thinned, time.elaps.KSD.thinned, time.elaps.KSD.thinned.total,
+save(n.all, KSD.all, time.elaps.KSD, KSD.thinned, time.elaps.KSD.thinned, time.elaps.KSD.thinned.thinning,
      file = "03 KSD vs Stein_thinned KSD.Rdata")
 
 
@@ -202,7 +200,7 @@ ggplot() +
         axis.text = element_text(size = 14),
         legend.position = "bottom",
         legend.title = element_blank(),
-        legend.text = element_text(size = 16)) + xlim(c(100,2500))
+        legend.text = element_text(size = 16)) #+ xlim(c(100,2500))
 
 #--------------------------------------------
 #plot for time
@@ -215,7 +213,7 @@ df.1 <- data.frame(n = rep(n.all,2),
 
 ggplot() +
   geom_line(data = df.1, mapping = aes(x = n, y = Time, col = Event), lwd = 1) +
-  labs(x = "Sample Size", y = "log(Time)", color = "") + xlim(c(100,2500)) +
+  labs(x = "Sample Size", y = "log(Time)", color = "") + #xlim(c(100,2500)) +
   theme(axis.title = element_text(size = 15),
         axis.text = element_text(size = 13),
         legend.position = "none")
@@ -229,15 +227,15 @@ df.2 <- data.frame(n = rep(n.all,3),
                            rep("event3", length(n.all))),
                  Time = c(time.elaps.KSD,
                           time.elaps.KSD.thinned,
-                          time.elaps.KSD.thinned.total))
+                          time.elaps.KSD.thinned.thinning))
 
 #-- -- -- -- -- --
 
 ggplot() +
   geom_line(aes(x = n.all, y = time.elaps.KSD), color = "#F8766D", size = 1) + 
-  geom_line(aes(x = n.all, y = time.elaps.KSD.thinned), color = "#00BFC4", lty = "twodash", size = 1) +
-  geom_line(aes(x = n.all, y = time.elaps.KSD.thinned.total), color = "#00BFC4", size = 1) +
-  labs(x = "Sample Size", y = "Time") +
+  geom_line(aes(x = n.all, y = time.elaps.KSD.thinned), color = "#00BFC4", size = 1) +
+  geom_line(aes(x = n.all, y = time.elaps.KSD.thinned.thinning), color = "#00BFC4", lty = "twodash",  size = 1) +
+  labs(x = "Sample Size", y = "Time") + # xlim(c(100,2500)) +
   theme(axis.title = element_text(size = 15),
         axis.text = element_text(size = 13),
         legend.position = "bottom",

@@ -68,7 +68,7 @@ Kp.xy <- function(x,y,n)
 #choosing the indices
 
 #sample
-n <- 350
+n <- 400
 d <- 2
 
 source("00 Draw_MVN_MCMC.R")

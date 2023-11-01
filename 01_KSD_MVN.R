@@ -2,32 +2,36 @@
 
 ##Necessary functions
 #-------------------------------------------------------
-dx.dy.k_xy <- function(x, y, j, val, b = -0.5, c = 1){
-  ret <- - 2 * b * (  (b-1) * val^(b-2) * 2 * (x[j] - y[j])^2  +
-                      val^(b-1)  )
+dx.dy.k_xy <- function(x, y, j, val, b = -0.5, c = 1)
+{
+  ret <- - 2 * b * (  (b-1) * val^(b-2) * 2 * (x[j] - y[j])^2  +  val^(b-1)  )
   return(ret)
 }
 
 #-------------------------------------------------------
-dx.k_xy <- function(x, y, j, val, b = -0.5, c = 1){
+dx.k_xy <- function(x, y, j, val, b = -0.5, c = 1)
+{
   ret <- b * val^(b-1) * 2 * (x[j] - y[j])
   return(ret)
 }
 
 #-------------------------------------------------------
 #
-dy.k_xy <- function(x, y, j, val, b = -0.5, c = 1){
+dy.k_xy <- function(x, y, j, val, b = -0.5, c = 1)
+{
   ret <- b * val^(b-1) * (-2) * (x[j] - y[j])
   return(ret)
 }
 
 #-------------------------------------------------------
 #The KSD with IMQ base kernel
-k_xy <- function(x, y, val, b = -0.5, c = 1){
-  if (length(x) == length(y)){
+k_xy <- function(x, y, val, b = -0.5, c = 1)
+{
+  if (length(x) == length(y))
+  {
     ret <- val^b
-  }
-  else{
+  }else
+  {
     ret <- Inf
   }
   return(ret)
@@ -35,8 +39,8 @@ k_xy <- function(x, y, val, b = -0.5, c = 1){
 
 #-------------------------------------------------------
 #defining the Stein Kernel
-k_j0 <- function(x, y, j, b.x, b.y, c = 1){
-  
+k_j0 <- function(x, y, j, b.x, b.y, c = 1)
+{
   val <-  c^2 + norm(x-y, type = "2")^2 
   
   term1 <- b.x[j] * b.y[j] * k_xy(x,y, val)
@@ -55,18 +59,18 @@ k_j0 <- function(x, y, j, b.x, b.y, c = 1){
 
 KSD <- function(samp)
 {
-  
   d <- ncol(samp)
   n <- nrow(samp)
-  w <- numeric()
+  w <- numeric(length = d)
   
-  for ( j in 1:d){
+  for ( j in 1:d)
+  {
+    sum <- 0
     
-    sum = 0
-    
-    for (i.x in 1:n){
-      for (i.y in 1:n){
-        
+    for (i.x in 1:n)
+    {
+      for (i.y in 1:n)
+      {
         x <- as.vector(samp[i.x,])
         y <- as.vector(samp[i.y,])
         
@@ -74,7 +78,6 @@ KSD <- function(samp)
         b.y <- -y
 
         sum = sum + 1/n^2 * k_j0(x, y, j, b.x, b.y)
-        #sum = c(sum, 1/n^2 * k_j0(x, y, j, b.x, b.y))
         
       }
     }
@@ -112,13 +115,14 @@ registerDoParallel(cl)
 
 KSD.par <- function(samp)
 {
-  
-  parallel_function <- function(j){
-    
+  parallel_function <- function(j)
+  {
     sum = 0
     
-    for (i.x in 1:n){
-      for (i.y in 1:n){
+    for (i.x in 1:n)
+    {
+      for (i.y in 1:n)
+      {
         
         x <- as.vector(samp[i.x,])
         y <- as.vector(samp[i.y,])
@@ -171,11 +175,12 @@ KSD.par <- function(samp)
   
   d <- ncol(samp)
   n <- nrow(samp)
-  w <- numeric()
   
   list.w <- foreach(j = 1:d) %dopar% {
     parallel_function(j)
   }
+  
+  w <- numeric(length = d)
   
   for (ii in 1:length(list.w))
   {
@@ -192,13 +197,13 @@ KSD.par <- function(samp)
 
 n <- c(25, 50, 100, 200, 500, 1000, 2000)
 d <- 2
-KSDs <- numeric()
-time.elaps <- numeric()
+KSDs <- numeric(length = length(n))
+time.elaps <- numeric(length = length(n))
 
-source("00 Draw_MVN_MCMC.R")
+source("00_Draw_MVN_MCMC.R")
 
-for (i in 1:length(n)){
-  
+for (i in 1:length(n))
+{
   set.seed(100+i)
   
   samp <- draw.mvn.mcmc(n[i], d = d, mu = rep(0,d), sigma = diag(d))[[1]]
@@ -216,18 +221,17 @@ for (i in 1:length(n)){
 
 stopCluster(cl)
 
-save(n, KSDs, time.elaps, file = "01 KSD_MVN_Plot.Rdata")
+save(n, KSDs, time.elaps, file = "01_KSD_MVN.Rdata")
 
 #--------------
 
 #rm(list = ls())
-load("01 KSD_MVN_Plot.Rdata")
+load("01_KSD_MVN.Rdata")
 
 (n = n)
 (KSD = KSDs)
 time.elaps     #in seconds
-time.elaps.scaled <- time.elaps * max(KSDs) / max(time.elaps)   #scaling of the time component
-Time <- time.elaps * max(KSDs) / max(time.elaps)   #scaling of the time component
+Time <- time.elaps * max(KSDs) / max(time.elaps)                 #scaling of the time component
 
 library(ggplot2)
 
@@ -247,3 +251,4 @@ ggplot()+
         axis.title.y.right=element_text(color="#00BFC4"),
         axis.text.y.right=element_text(color="#00BFC4"),
         legend.position = "bottom")
+

@@ -1,6 +1,6 @@
 # Stein_Discrepancy_in_MCMC
 
-This repository contains all the Rcodes, .Rdata file and the required plos in .pdf format that have been used in the project. Below we describe the files as they have been created:
+This repository contains all the Rcodes, .Rdata file and the required plots in .pdf format that have been used in the project. Below we describe the files as they have been created:
 
 * **00_Draw_MVN_MCMC.R**: The .R file which is sourced in almost every other parts of code and contains code for drawing MCMC samples that has a multivariate normal distribution as the stationary distribution.
 * **00_Stein_Thin_Indices.cpp**: The C++ file that contains code for Stein-thinning of a MCMC samples with the target distribution being the standard normal distribution of appropriate order.

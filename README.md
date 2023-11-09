@@ -1,4 +1,4 @@
-# Stein_Discrepancy_in_MCMC
+# Stein_discrepancy_in_MCMC
 
 This repository contains all the Rcodes, .Rdata file and the required plots in .pdf format that have been used in the project. Below we describe the files as they have been created:
 
